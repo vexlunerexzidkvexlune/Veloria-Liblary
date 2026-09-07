@@ -434,7 +434,7 @@ local Library = {
         SidebarColor = Color3.fromRGB(13, 5, 5),
         SidebarAccentColor = Color3.fromRGB(210, 35, 35),
 
-        BackgroundImage = ""
+        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-07-737c5661-8c39-434f-861a-d578d70fe1a6.png"
     },
 
     --// Registry \\--
@@ -584,9 +584,9 @@ local Templates = {
         -- Bisa langsung di-set dari config Window saat CreateWindow:
         -- BackgroundImage = "rbxassetid://123456789",
         -- atau URL gambar https://... (akan di-download sebagai custom asset).
-        BackgroundImage = "",
-        BackgroundImageTransparency = 0.20,
-        BackgroundImageScaleType = "Stretch",
+        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-07-737c5661-8c39-434f-861a-d578d70fe1a6.png",
+        BackgroundImageTransparency = 0.72,
+        BackgroundImageScaleType = "Crop",
         BackgroundImageColor3 = Color3.new(1, 1, 1),
 
         --// Animations \\--
@@ -14456,6 +14456,13 @@ function Library:CreateWindow(WindowInfo)
 
     Window.MainFrame = MainFrame
     Library.Window = Window
+
+    --// Veloria default background: apply configured URL automatically
+    if typeof(WindowInfo.BackgroundImage) == "string" and WindowInfo.BackgroundImage ~= "" then
+        pcall(function()
+            Window:SetBackgroundImage(WindowInfo.BackgroundImage)
+        end)
+    end
 
     return Window
 end
