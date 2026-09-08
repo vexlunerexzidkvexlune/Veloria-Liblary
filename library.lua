@@ -552,12 +552,23 @@ local Templates = {
         ToggleKeybind = Enum.KeyCode.RightControl,
 
         -- Veloria topbar button callbacks
-        DiscordCallback  = nil,   -- function() -- called when Discord button clicked
-        MinimizeCallback = nil,   -- function() -- override minimize behavior
-        CloseCallback    = nil,   -- function() -- override close behavior
+        SupportCallback  = nil,
+        SupportLink      = nil,
+        SupportIcon      = "message-circle",
+        SupportShape     = "Circle", -- "Circle" or "Square"
+        DiscordCallback  = nil,   -- legacy alias
+        MinimizeCallback = nil,
+        CloseCallback    = nil,
 
         ShowMobileButtons = true,
         MobileButtonsSide = "Left",
+
+        -- Open UI floating button icon. Accepts Roblox asset IDs (rbxassetid://...)
+        -- or any image URL supported by GetCustomIcon().
+        OpenUIIcon = "rbxassetid://90384664719494",
+        OpenUIIconSize = 26,
+        OpenUIButtonSize = 44,
+        OpenUIShape = "Circle", -- "Circle" or "Square"
 
         UnlockMouseWhileOpen = true,
 
@@ -709,6 +720,7 @@ local Templates = {
         --// Expand controls \--
         Expand = true,
         DefaultExpanded = false,
+        Searchable = true,
 
         Multi = false,
         DragSelect = false,
@@ -8200,6 +8212,10 @@ do
             Multi = Info.Multi,
             DragSelect = Info.Multi and not Library.IsMobile and Info.DragSelect == true,
 
+            Expand = Info.Expand ~= false,
+            DefaultExpanded = Info.DefaultExpanded == true,
+            Searchable = Info.Searchable ~= false,
+
             SpecialType = Info.SpecialType,
             ExcludeLocalPlayer = Info.ExcludeLocalPlayer,
             EnablePlayerImages = Info.EnablePlayerImages,
@@ -8299,7 +8315,7 @@ do
         end
 
         local SearchBox
-        if Info.Searchable then
+        if Dropdown.Searchable then
             SearchBox = New("TextBox", {
                 BackgroundTransparency = 1,
                 PlaceholderText = "Search...",
@@ -11301,7 +11317,7 @@ function Library:CreateWindow(WindowInfo)
         --// Veloria Topbar Buttons \--
         -- Tombol-tombol di sebelah kanan search: Discord, Minimize, Close
         -- Declared as upvalues — assigned to Window table after Window = {} below
-        local VeloriaDiscordBtn, VeloriaMinimizeBtn, VeloriaCloseBtn
+        local VeloriaDiscordBtn, VeloriaSupportBtn, VeloriaMinimizeBtn, VeloriaCloseBtn
         -- Masuk ke RightWrapper (UIListLayout horizontal, fill kiri ke kanan)
         do
             local function MakeTopbarBtn(Icon, Color, Callback)
@@ -11348,12 +11364,35 @@ function Library:CreateWindow(WindowInfo)
                 return Btn
             end
 
-            -- Discord button (logo discord = message-circle di lucide)
-            local DiscordBtn = MakeTopbarBtn("message-circle", Library.Scheme.MainColor, function()
-                if WindowInfo.DiscordCallback then
-                    WindowInfo.DiscordCallback()
+            -- Generic support button: Roblox / Discord / website / any URL.
+            local SupportBtn = MakeTopbarBtn(
+                WindowInfo.SupportIcon or "message-circle",
+                Library.Scheme.MainColor,
+                function()
+                    if WindowInfo.SupportCallback then
+                        WindowInfo.SupportCallback()
+                    elseif WindowInfo.SupportLink and setclipboard then
+                        setclipboard(WindowInfo.SupportLink)
+                        Library:Notify({
+                            Title = "Support",
+                            Description = "Support link copied to clipboard!",
+                            Time = 3,
+                        })
+                    elseif WindowInfo.DiscordCallback then
+                        WindowInfo.DiscordCallback()
+                    end
                 end
-            end)
+            )
+
+            local SupportShape = tostring(WindowInfo.SupportShape or "Circle"):lower()
+            local SupportCorner = SupportShape == "square"
+                and UDim.new(0, WindowInfo.CornerRadius)
+                or UDim.new(1, 0)
+
+            local ExistingCorner = SupportBtn:FindFirstChildOfClass("UICorner")
+            if ExistingCorner then
+                ExistingCorner.CornerRadius = SupportCorner
+            end
 
             -- Minimize button
             local MinimizeBtn = MakeTopbarBtn("minus", Library.Scheme.MainColor, function()
@@ -11390,7 +11429,8 @@ function Library:CreateWindow(WindowInfo)
 
             -- Store refs ke upvalue locals buat Window methods
             -- (Window table belum exist di sini, assign setelah Window = {} dibuat)
-            VeloriaDiscordBtn  = DiscordBtn
+            VeloriaDiscordBtn  = SupportBtn -- legacy alias
+            VeloriaSupportBtn   = SupportBtn
             VeloriaMinimizeBtn = MinimizeBtn
             VeloriaCloseBtn    = CloseBtn
         end
@@ -11545,7 +11585,8 @@ function Library:CreateWindow(WindowInfo)
     Library.ActiveWindow = Window
 
     -- Veloria: assign topbar button refs now that Window exists
-    Window.DiscordBtn  = VeloriaDiscordBtn
+    Window.DiscordBtn  = VeloriaDiscordBtn -- legacy alias
+    Window.SupportBtn  = VeloriaSupportBtn
     Window.MinimizeBtn = VeloriaMinimizeBtn
     Window.CloseBtn    = VeloriaCloseBtn
     local Fading = false
@@ -11569,23 +11610,58 @@ function Library:CreateWindow(WindowInfo)
 
     --// Veloria: topbar button API \--
 
-    -- Set callback untuk Discord button
-    function Window:SetDiscordCallback(Callback: () -> ())
-        WindowInfo.DiscordCallback = Callback
+    -- Generic support callback.
+    function Window:SetSupportCallback(Callback: () -> ())
+        WindowInfo.SupportCallback = Callback
     end
 
-    -- Set Discord link langsung (auto-open via setclipboard)
-    function Window:SetDiscordLink(Link: string)
-        WindowInfo.DiscordCallback = function()
+    -- Generic support link: Roblox / Discord / website / any URL.
+    function Window:SetSupportLink(Link: string)
+        assert(typeof(Link) == "string", "Expected string for support link")
+        WindowInfo.SupportLink = Link
+        WindowInfo.SupportCallback = function()
             if setclipboard then
                 setclipboard(Link)
                 Library:Notify({
-                    Title = "Discord",
-                    Description = "Discord link copied to clipboard!",
+                    Title = "Support",
+                    Description = "Support link copied to clipboard!",
                     Time = 3,
                 })
             end
         end
+    end
+
+    function Window:SetSupportShape(Shape: string)
+        WindowInfo.SupportShape = tostring(Shape):lower() == "square" and "Square" or "Circle"
+
+        local Btn = Window.SupportBtn
+        local Corner = Btn and Btn:FindFirstChildOfClass("UICorner")
+        if Corner then
+            Corner.CornerRadius = WindowInfo.SupportShape == "Square"
+                and UDim.new(0, WindowInfo.CornerRadius)
+                or UDim.new(1, 0)
+        end
+    end
+
+    function Window:SetSupportIcon(Icon: string)
+        WindowInfo.SupportIcon = Icon
+
+        local Btn = Window.SupportBtn
+        local Image = Btn and Btn:FindFirstChildOfClass("ImageLabel")
+        local IconData = Library:GetCustomIcon(Icon)
+
+        if Image and IconData then
+            Library:ApplyLucideIcon(Image, IconData)
+        end
+    end
+
+    -- Legacy Discord aliases.
+    function Window:SetDiscordCallback(Callback: () -> ())
+        Window:SetSupportCallback(Callback)
+    end
+
+    function Window:SetDiscordLink(Link: string)
+        Window:SetSupportLink(Link)
     end
 
     -- Override minimize behavior
@@ -11599,10 +11675,10 @@ function Library:CreateWindow(WindowInfo)
     end
 
     -- Toggle visibility of topbar buttons
-    function Window:SetTopbarButtonsVisible(Discord: boolean?, Minimize: boolean?, Close: boolean?)
-        if Window.DiscordBtn  and Discord  ~= nil then Window.DiscordBtn.Visible  = Discord  end
+    function Window:SetTopbarButtonsVisible(Support: boolean?, Minimize: boolean?, Close: boolean?)
+        if Window.SupportBtn  and Support  ~= nil then Window.SupportBtn.Visible  = Support  end
         if Window.MinimizeBtn and Minimize ~= nil then Window.MinimizeBtn.Visible = Minimize end
-        if Window.CloseBtn   and Close    ~= nil then Window.CloseBtn.Visible    = Close    end
+        if Window.CloseBtn    and Close    ~= nil then Window.CloseBtn.Visible    = Close    end
     end
 
     function Window:SetBackgroundImage(Image: string)
@@ -14381,28 +14457,57 @@ function Library:CreateWindow(WindowInfo)
             Library:Toggle()
         end, true, true)
 
-        local LockButton = Library:AddDraggableButton("Lock", function(self)
-            Library.CantDragForced = not Library.CantDragForced
-            self:SetText(Library.CantDragForced and "Unlock" or "Lock")
-        end, true, true)
+        -- Veloria Open UI button: image-based, using the configured Roblox ID/URL.
+        do
+            local OpenButton = ToggleButton.Button
+            OpenButton.Text = ""
+            OpenButton.Size = UDim2.fromOffset(WindowInfo.OpenUIButtonSize or 44, WindowInfo.OpenUIButtonSize or 44)
+
+            for _, Child in OpenButton:GetChildren() do
+                if Child:IsA("TextLabel") or Child:IsA("TextButton") then
+                    Child.Visible = false
+                end
+            end
+
+            local Icon = Library:GetCustomIcon(WindowInfo.OpenUIIcon or "rbxassetid://90384664719494")
+            if Icon then
+                local IconImage = New("ImageLabel", {
+                    AnchorPoint = Vector2.new(0.5, 0.5),
+                    BackgroundTransparency = 1,
+                    ImageColor3 = "WhiteColor",
+                    Position = UDim2.fromScale(0.5, 0.5),
+                    Size = UDim2.fromOffset(WindowInfo.OpenUIIconSize or 26, WindowInfo.OpenUIIconSize or 26),
+                    Parent = OpenButton,
+                })
+                Library:ApplyLucideIcon(IconImage, Icon)
+            end
+
+            if string.lower(WindowInfo.OpenUIShape or "Circle") == "circle" then
+                local Circle = OpenButton:FindFirstChild("OpenUIShapeCorner")
+                if not Circle then
+                    Circle = New("UICorner", {
+                        Name = "OpenUIShapeCorner",
+                        CornerRadius = UDim.new(1, 0),
+                        Parent = OpenButton,
+                    })
+                else
+                    Circle.CornerRadius = UDim.new(1, 0)
+                end
+            end
+        end
 
         if WindowInfo.MobileButtonsSide == "Right" then
             ToggleButton.Button.AnchorPoint = Vector2.new(1, 0)
             ToggleButton.Button.Position = UDim2.new(1, -6, 0, 6)
 
-            LockButton.Button.AnchorPoint = Vector2.new(1, 0)
-            LockButton.Button.Position = UDim2.new(1, -(ToggleButton.Button.Size.X.Offset + 12), 0, 6)
         else
             ToggleButton.Button.AnchorPoint = Vector2.new(0, 0)
             ToggleButton.Button.Position = UDim2.fromOffset(6, 6)
 
-            LockButton.Button.AnchorPoint = Vector2.new(0, 0)
-            LockButton.Button.Position = UDim2.fromOffset(ToggleButton.Button.Size.X.Offset + 12, 6)
         end
 
         if WindowInfo.ShowMobileButtons == false then
             ToggleButton.Button.Visible = false
-            LockButton.Button.Visible = false
         end
     end
 
