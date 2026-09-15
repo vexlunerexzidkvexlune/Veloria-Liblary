@@ -434,7 +434,7 @@ local Library = {
         SidebarColor = Color3.fromRGB(13, 5, 5),
         SidebarAccentColor = Color3.fromRGB(210, 35, 35),
 
-        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-07-737c5661-8c39-434f-861a-d578d70fe1a6.png"
+        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-15-326ff0eb-b223-46aa-8bd4-8bd103881f45.png"
     },
 
     --// Registry \\--
@@ -595,7 +595,7 @@ local Templates = {
         -- Bisa langsung di-set dari config Window saat CreateWindow:
         -- BackgroundImage = "rbxassetid://123456789",
         -- atau URL gambar https://... (akan di-download sebagai custom asset).
-        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-07-737c5661-8c39-434f-861a-d578d70fe1a6.png",
+        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-15-326ff0eb-b223-46aa-8bd4-8bd103881f45.png",
         BackgroundImageTransparency = 0.72,
         BackgroundImageScaleType = "Crop",
         BackgroundImageColor3 = Color3.new(1, 1, 1),
@@ -14469,7 +14469,7 @@ function Library:CreateWindow(WindowInfo)
                 end
             end
 
-            local Icon = Library:GetCustomIcon(WindowInfo.OpenUIIcon or "rbxassetid://90384664719494")
+            local Icon = Library:GetCustomIcon(WindowInfo.OpenUIIcon or "rbxassetid://86790779748944")
             if Icon then
                 local IconImage = New("ImageLabel", {
                     AnchorPoint = Vector2.new(0.5, 0.5),
