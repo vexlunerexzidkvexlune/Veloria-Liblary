@@ -168,8 +168,8 @@ local CustomImageManager = {}
 
 --// Veloria custom icon aliases \--
 local CustomIconAliases = {
-    Veloria = "rbxassetid://90384664719494",
-    veloria = "rbxassetid://90384664719494",
+    Veloria = "rbxassetid://86790779748944",
+    veloria = "rbxassetid://86790779748944",
 }
 
 local CustomImageManagerAssets = {
