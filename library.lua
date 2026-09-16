@@ -168,8 +168,8 @@ local CustomImageManager = {}
 
 --// Veloria custom icon aliases \--
 local CustomIconAliases = {
-    Veloria = "rbxassetid://86790779748944",
-    veloria = "rbxassetid://86790779748944",
+    Veloria = "rbxassetid://70635760917900",
+    veloria = "rbxassetid://70635760917900",
 }
 
 local CustomImageManagerAssets = {
@@ -434,7 +434,7 @@ local Library = {
         SidebarColor = Color3.fromRGB(13, 5, 5),
         SidebarAccentColor = Color3.fromRGB(210, 35, 35),
 
-        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-15-326ff0eb-b223-46aa-8bd4-8bd103881f45.png"
+        BackgroundImage = "https://cdn.phototourl.com/member/2026-09-16-fe8ad403-6fa5-4bea-acdc-8cf341d10336.png"
     },
 
     --// Registry \\--
@@ -555,7 +555,7 @@ local Templates = {
         SupportCallback  = nil,
         SupportLink      = nil,
         SupportIcon      = "message-circle",
-        SupportShape     = "Circle", -- "Circle" or "Square"
+        SupportShape     = "Square", -- "Circle" or "Square"
         DiscordCallback  = nil,   -- legacy alias
         MinimizeCallback = nil,
         CloseCallback    = nil,
@@ -565,7 +565,7 @@ local Templates = {
 
         -- Open UI floating button icon. Accepts Roblox asset IDs (rbxassetid://...)
         -- or any image URL supported by GetCustomIcon().
-        OpenUIIcon = "rbxassetid://90384664719494",
+        OpenUIIcon = "rbxassetid://70635760917900",
         OpenUIIconSize = 26,
         OpenUIButtonSize = 44,
         OpenUIShape = "Circle", -- "Circle" or "Square"
@@ -595,7 +595,7 @@ local Templates = {
         -- Bisa langsung di-set dari config Window saat CreateWindow:
         -- BackgroundImage = "rbxassetid://123456789",
         -- atau URL gambar https://... (akan di-download sebagai custom asset).
-        BackgroundImage = "https://cdn.phototourl.com/free/2026-09-15-326ff0eb-b223-46aa-8bd4-8bd103881f45.png",
+        BackgroundImage = "https://cdn.phototourl.com/member/2026-09-16-fe8ad403-6fa5-4bea-acdc-8cf341d10336.png",
         BackgroundImageTransparency = 0.72,
         BackgroundImageScaleType = "Crop",
         BackgroundImageColor3 = Color3.new(1, 1, 1),
