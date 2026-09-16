@@ -523,7 +523,7 @@ local Templates = {
 
         Position = UDim2.fromOffset(6, 6),
         Size = UDim2.fromOffset(680, 560),
-        IconSize = UDim2.fromOffset(28, 28),
+        IconSize = UDim2.fromOffset(34, 34),
 
         AutoShow = true,
         Center = true,
