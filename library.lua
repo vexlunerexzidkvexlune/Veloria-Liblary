@@ -521,7 +521,7 @@ local Templates = {
         Title = "Veloria Hub",
         Footer = "Veloria Hub Premium Support | By Rexz",
 
-        Position = UDim2.fromOffset(6, 6),
+        Position = UDim2.fromOffset(12, 6),
         Size = UDim2.fromOffset(680, 560),
         IconSize = UDim2.fromOffset(34, 34),
 
