@@ -13,7 +13,7 @@
 ██║  ██║╚██████╔╝██████╔╝
 ╚═╝  ╚═╝ ╚═════╝ ╚═════╝
 ]]
--- By Rexz Owner Veloria Hub Original By Obsidian Liblary 
+-- By Rexz Owner Veloria Hub Original By Obsidian Liblary Hmm
 
 
 
@@ -417,22 +417,22 @@ local Library = {
     --// Scheme \\--
     IsLightTheme = false,
     Scheme = {
-        -- Veloria Hub — merah-hitam
-        BackgroundColor = Color3.fromRGB(10, 10, 10),
-        MainColor = Color3.fromRGB(18, 18, 18),
-        AccentColor = Color3.fromRGB(210, 35, 35),
-        OutlineColor = Color3.fromRGB(80, 15, 15),
+        -- Veloria Hub — merah kerajaan gradasi kuning emas
+        BackgroundColor = Color3.fromRGB(10, 8, 8),
+        MainColor = Color3.fromRGB(20, 14, 12),
+        AccentColor = Color3.fromRGB(212, 170, 50),
+        OutlineColor = Color3.fromRGB(70, 45, 8),
         FontColor = Color3.new(1, 1, 1),
         Font = Font.fromEnum(Enum.Font.GothamSemibold),
 
-        RedColor = Color3.fromRGB(210, 35, 35),
-        DestructiveColor = Color3.fromRGB(200, 20, 20),
+        RedColor = Color3.fromRGB(210, 45, 30),
+        DestructiveColor = Color3.fromRGB(180, 25, 25),
         DarkColor = Color3.new(0, 0, 0),
         WhiteColor = Color3.new(1, 1, 1),
 
-        -- Veloria sidebar bg
-        SidebarColor = Color3.fromRGB(13, 5, 5),
-        SidebarAccentColor = Color3.fromRGB(210, 35, 35),
+        -- Veloria sidebar bg — hitam kemerahan hangat
+        SidebarColor = Color3.fromRGB(12, 4, 4),
+        SidebarAccentColor = Color3.fromRGB(212, 170, 50),
 
         BackgroundImage = "https://cdn.phototourl.com/member/2026-09-16-fe8ad403-6fa5-4bea-acdc-8cf341d10336.png"
     },
@@ -568,7 +568,7 @@ local Templates = {
         OpenUIIcon = "rbxassetid://70635760917900",
         OpenUIIconSize = 26,
         OpenUIButtonSize = 44,
-        OpenUIShape = "Circle", -- "Circle" or "Square"
+        OpenUIShape = "Square", -- "Circle" or "Square"
 
         UnlockMouseWhileOpen = true,
 
@@ -15425,16 +15425,32 @@ function Library:SetSidebarColor(Color: Color3)
     Library:UpdateColorsUsingRegistry()
 end
 
--- Default Veloria theme (red/black) — lo bisa override setelah CreateWindow
+-- Default Veloria theme (merah kerajaan → emas) — lo bisa override setelah CreateWindow
 Library.VeloriaTheme = {
-    -- Preset buat nanti customisasi
-    Red       = Color3.fromRGB(210, 35, 35),
-    DarkRed   = Color3.fromRGB(160, 20, 20),
-    Orange    = Color3.fromRGB(220, 100, 30),
+    -- Gradient palette: merah kerajaan → tembaga → kuning emas
+    Red       = Color3.fromRGB(200, 40, 40),    -- merah kerajaan
+    DarkRed   = Color3.fromRGB(140, 20, 18),    -- merah tua
+    Crimson   = Color3.fromRGB(180, 25, 25),    -- merah dalam
+    Copper    = Color3.fromRGB(200, 90, 30),    -- tembaga — titik tengah gradient
+    Orange    = Color3.fromRGB(210, 120, 25),   -- oranye emas
+    Gold      = Color3.fromRGB(212, 170, 50),   -- kuning emas kerajaan
+    RoyalGold = Color3.fromRGB(230, 195, 80),   -- emas terang / highlight
     Purple    = Color3.fromRGB(130, 60, 210),
     Blue      = Color3.fromRGB(40, 100, 220),
-    Gold      = Color3.fromRGB(200, 160, 30),
 }
+
+-- Terapkan feel "merah → emas" secara bertahap:
+-- SetAccentColor(Library.VeloriaTheme.Gold)       → full gold
+-- SetAccentColor(Library.VeloriaTheme.Copper)     → tengah gradient
+-- SetAccentColor(Library.VeloriaTheme.Red)        → kembali ke merah kerajaan
+function Library:SetRoyalGradient(Intensity: number?)
+    -- Intensity 0.0 = merah murni, 1.0 = emas murni
+    local t = math.clamp(Intensity or 0.5, 0, 1)
+    local R = Color3.fromRGB(200, 40, 40)
+    local G = Color3.fromRGB(212, 170, 50)
+    local Blended = R:Lerp(G, t)
+    Library:SetAccentColor(Blended)
+end
 
 getgenv().Library = Library
 getgenv().VeloriaHub = Library  -- alias
